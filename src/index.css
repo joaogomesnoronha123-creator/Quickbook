@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FACC15; /* Yellow-400 */
+  --color-secondary: #18181B; /* Zinc-900 */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    @apply transition-colors duration-300;
+  }
+  
+  body {
+    @apply bg-[#FCFBF7] text-zinc-900 transition-colors duration-300;
+  }
+  
+  html.dark body {
+    @apply bg-black text-white;
+  }
+
+  html.light body {
+    @apply bg-[#FCFBF7] text-zinc-900;
+  }
+}
+
+.glass-card {
+  background: rgba(24, 24, 27, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(250, 204, 21, 0.1);
+}
+
+.btn-primary {
+  background-color: #FACC15;
+  color: #000000;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #EAB308;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.3);
+}
