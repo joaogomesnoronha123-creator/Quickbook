@@ -35,9 +35,13 @@ export default function Login() {
       }, { merge: true });
 
     } catch (err: any) {
-      console.error(err);
+      console.error('Google Sign-In Error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
         // Just ignore
+      } else if (err.code === 'auth/network-request-failed') {
+        setError(language === 'English (US)' ? 'Network error. Check your connection.' : 'Erro de conexão. Verifique sua internet.');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError(language === 'English (US)' ? 'Google sign-in is disabled.' : 'O login com Google está desativado no Firebase.');
       } else {
         setError(t.error);
       }
@@ -71,8 +75,22 @@ export default function Login() {
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err: any) {
-      console.error(err);
-      setError(t.error);
+      console.error('Email Auth Error:', err);
+      if (err.code === 'auth/email-already-in-use') {
+        setError(language === 'English (US)' ? 'Email already in use.' : 'Este e-mail já está em uso.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError(language === 'English (US)' ? 'Invalid email.' : 'E-mail inválido.');
+      } else if (err.code === 'auth/weak-password') {
+        setError(language === 'English (US)' ? 'Password too weak (min. 6 characters).' : 'A senha é muito fraca (mín. 6 caracteres).');
+      } else if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError(language === 'English (US)' ? 'Invalid email or password.' : 'E-mail ou senha incorretos.');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError(language === 'English (US)' ? 'Network error. Try again.' : 'Erro de conexão. Tente novamente.');
+      } else if (err.message?.includes('Missing or insufficient permissions')) {
+        setError(language === 'English (US)' ? 'Permission error. Contact support.' : 'Erro de permissão no banco de dados.');
+      } else {
+        setError(t.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -125,9 +143,11 @@ export default function Login() {
       }, { merge: true });
 
     } catch (err: any) {
-      console.error(err);
+      console.error('Anonymous Auth Error:', err);
       if (err.code === 'auth/admin-restricted-operation' || err.code === 'auth/operation-not-allowed') {
-        setError('O login anônimo está desativado no Firebase.');
+        setError(language === 'English (US)' ? 'Anonymous login is disabled in Firebase.' : 'O login anônimo está desativado no Firebase.');
+      } else if (err.message?.includes('Missing or insufficient permissions')) {
+        setError(language === 'English (US)' ? 'Permission error.' : 'Erro de permissão no banco de dados.');
       } else {
         setError(t.error);
       }
