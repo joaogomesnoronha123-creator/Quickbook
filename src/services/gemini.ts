@@ -1,58 +1,54 @@
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function summarizeBook(title: string, content: string) {
-  console.log('Summarizing book:', title, 'Content length:', content.length);
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `Resuma o seguinte livro/conteúdo de forma estruturada para estudos:
-      Título: ${title}
-      Conteúdo: ${content}
-      
-      O resumo deve conter:
-      1. Ideias principais
-      2. Tópicos importantes
-      3. Conclusão`,
+    const response = await fetch('/api/gemini/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content })
     });
-    console.log('Summary generated successfully');
-    return response.text;
+    if (!response.ok) throw new Error('Failed to summarize');
+    const data = await response.json();
+    return data.text;
   } catch (error) {
-    console.error('Gemini Summarization Error:', error);
+    console.error('Summarize Error:', error);
     throw error;
   }
 }
 
-export async function chatWithBook(summary: string, question: string, history: { role: string, parts: { text: string }[] }[]) {
-  const chat = ai.chats.create({
-    model: "gemini-3-flash-preview",
-    config: {
-      systemInstruction: `Você é um assistente especializado no livro resumido abaixo. 
-      Resumo: ${summary}
-      Responda dúvidas de forma clara e educativa.`,
-    },
-  });
-  
-  // Note: sendMessage doesn't support history directly in this SDK version easily without manual contents management
-  // but we can use the chat object if we manage it correctly.
-  const response = await chat.sendMessage({ message: question });
-  return response.text;
+export async function chatWithBook(summary: string, question: string, history: any[]) {
+  try {
+    const response = await fetch('/api/gemini/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ summary, question, history })
+    });
+    if (!response.ok) throw new Error('Failed to chat');
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error('Chat Error:', error);
+    throw error;
+  }
 }
 
 export async function generalChatStream(question: string, history: any[]) {
   try {
-    const response = await ai.models.generateContentStream({
-      model: "gemini-3-flash-preview",
-      contents: [...history, { role: "user", parts: [{ text: question }] }],
-      config: {
-        systemInstruction: "Você é o assistente virtual do QuickBook, um app inteligente de resumos e estudos. Responda de forma prestativa, curta e motivadora. Você pode ajudar com dúvidas sobre o app, dicas de estudo ou curiosidades literárias.",
-        thinkingConfig: { thinkingLevel: "LOW" as any }
-      },
+    // Current server implementation doesn't support streaming easily over HTTP without SSE or WebSocket
+    // So we'll simulate it for the frontend or use a regular request for now.
+    const response = await fetch('/api/gemini/general-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, history })
     });
-    return response;
+    
+    if (!response.ok) throw new Error('Failed to chat');
+    const data = await response.json();
+    
+    // Create a generator-like object to maintain compatibility with the UI's stream loop
+    return (async function* () {
+      yield { text: data.text };
+    })();
   } catch (error) {
-    console.error('Gemini General Chat Stream Error:', error);
+    console.error('General Chat Error:', error);
     throw error;
   }
 }
