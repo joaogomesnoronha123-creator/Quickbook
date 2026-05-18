@@ -78,7 +78,20 @@ export const translations = {
       backToLogin: 'Voltar para o Login',
       resetSent: 'Link de redefinição enviado para seu e-mail!',
       error: 'Erro ao processar. Verifique seus dados.',
-      title: 'Bem-vindo ao QuickBook'
+      title: 'Bem-vindo ao QuickBook',
+      errors: {
+        invalidEmail: 'E-mail inválido.',
+        userNotFound: 'Usuário não encontrado.',
+        wrongPassword: 'Senha incorreta.',
+        emailInUse: 'Este e-mail já está em uso.',
+        weakPassword: 'A senha é muito fraca.',
+        tooManyRequests: 'Muitas tentativas. Tente mais tarde.',
+        networkError: 'Erro de conexão.',
+        popupClosed: 'Login cancelado.',
+        operationNotAllowed: 'Operação não permitida.',
+        userDisabled: 'Usuário desativado.',
+        permissionDenied: 'Erro de permissão no banco de dados.'
+      }
     },
     chat: {
       title: 'Assistente IA',
@@ -164,7 +177,20 @@ export const translations = {
       backToLogin: 'Back to Login',
       resetSent: 'Reset link sent to your email!',
       error: 'Authentication error. Check your credentials.',
-      title: 'Welcome to QuickBook'
+      title: 'Welcome to QuickBook',
+      errors: {
+        invalidEmail: 'Invalid email address.',
+        userNotFound: 'User not found.',
+        wrongPassword: 'Incorrect password.',
+        emailInUse: 'Email already in use.',
+        weakPassword: 'Password is too weak.',
+        tooManyRequests: 'Too many attempts. Try again later.',
+        networkError: 'Network error. Please check your connection.',
+        popupClosed: 'Login process was cancelled.',
+        operationNotAllowed: 'This operation is not allowed.',
+        userDisabled: 'This user account has been disabled.',
+        permissionDenied: 'Database permission error.'
+      }
     },
     chat: {
       title: 'AI Assistant',
