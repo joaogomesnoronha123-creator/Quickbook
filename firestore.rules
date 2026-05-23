@@ -32,7 +32,7 @@ service cloud.firestore {
       function isValidUser(data) {
         return data.keys().hasAll(['name', 'createdAt']) && 
                data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
-               (data.createdAt == request.time || data.createdAt == resource.data.createdAt);
+               data.createdAt == (resource == null ? request.time : resource.data.createdAt);
       }
 
       allow get: if isOwner(userId);
@@ -40,7 +40,7 @@ service cloud.firestore {
       allow update: if isOwner(userId) && 
                       isValidUser(incoming()) && 
                       incoming().createdAt == existing().createdAt &&
-                      incoming().diff(existing()).affectedKeys().hasOnly(['name', 'lastActive', 'email', 'isAnonymous']);
+                      incoming().diff(existing()).affectedKeys().hasOnly(['name', 'lastActive', 'email', 'isAnonymous', 'isLinked']);
     }
 
     // Library Rules
@@ -52,7 +52,7 @@ service cloud.firestore {
                data.author is string && data.author.size() > 0 && data.author.size() < 500 &&
                data.summary is string && data.summary.size() > 0 &&
                data.ownerId == request.auth.uid &&
-               data.createdAt == request.time;
+               data.createdAt == (resource == null ? request.time : resource.data.createdAt);
       }
 
       function isValidId(id) {
@@ -60,7 +60,7 @@ service cloud.firestore {
       }
 
       allow list, get: if isOwner(userId);
-      allow create: if isOwner(userId); // Minimal check to debug
+      allow create: if isOwner(userId) && isValidBook(incoming());
       allow update: if isOwner(userId) && 
                       isValidBook(incoming()) &&
                       incoming().createdAt == existing().createdAt &&
@@ -74,7 +74,7 @@ service cloud.firestore {
                  data.keys().size() == 3 &&
                  data.role in ['user', 'model'] &&
                  data.text is string && data.text.size() > 0 &&
-                 data.timestamp == request.time;
+                 data.timestamp == (resource == null ? request.time : resource.data.timestamp);
         }
 
         allow list, get: if isOwner(userId);

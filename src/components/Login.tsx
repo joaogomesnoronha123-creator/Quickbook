@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, ArrowRight, User, Mail, Lock } from 'lucide-react';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { signInAnonymously, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useLanguage } from '../contexts/LanguageContext';
 
 type AuthMode = 'login' | 'register' | 'anonymous' | 'forgot_password';
@@ -52,12 +52,22 @@ export default function Login() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
-      await setDoc(doc(db, 'users', user.uid), {
-        name: user.displayName || 'Estudante',
-        email: user.email,
-        createdAt: serverTimestamp(),
-        lastActive: serverTimestamp()
-      }, { merge: true });
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName || 'Estudante',
+          email: user.email,
+          createdAt: serverTimestamp(),
+          lastActive: serverTimestamp()
+        });
+      } else {
+        await setDoc(userRef, {
+          name: user.displayName || userSnap.data()?.name || 'Estudante',
+          email: user.email || userSnap.data()?.email,
+          lastActive: serverTimestamp()
+        }, { merge: true });
+      }
 
     } catch (err: any) {
       if (err.code !== 'auth/popup-closed-by-user') {
@@ -83,7 +93,8 @@ export default function Login() {
           await updateProfile(user, { displayName: name.trim() });
         }
 
-        await setDoc(doc(db, 'users', user.uid), {
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, {
           name: name.trim() || 'Estudante',
           email: user.email,
           createdAt: serverTimestamp(),
@@ -131,12 +142,22 @@ export default function Login() {
       
       const guestName = name.trim() || (trans.nav.home === 'Início' ? 'Visitante' : 'Guest');
 
-      await setDoc(doc(db, 'users', user.uid), {
-        name: guestName,
-        createdAt: serverTimestamp(),
-        lastActive: serverTimestamp(),
-        isAnonymous: true
-      }, { merge: true });
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          name: guestName,
+          createdAt: serverTimestamp(),
+          lastActive: serverTimestamp(),
+          isAnonymous: true
+        });
+      } else {
+        await setDoc(userRef, {
+          name: guestName,
+          lastActive: serverTimestamp(),
+          isAnonymous: true
+        }, { merge: true });
+      }
 
     } catch (err: any) {
       setError(getAuthErrorMessage(err));
