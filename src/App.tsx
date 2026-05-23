@@ -97,7 +97,7 @@ export default function App() {
           <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/20 shrink-0">
             <BookOpen className="text-black w-6 h-6" />
           </div>
-          <span className="hidden lg:block font-black text-2xl tracking-tighter text-yellow-400 truncate">QuickBook</span>
+          <span className="hidden lg:block font-black text-2xl tracking-tighter text-yellow-400 truncate">QuickBook AI</span>
         </div>
 
         <div className="flex-1 flex md:flex-col w-full justify-around md:justify-start gap-2 md:gap-3 lg:gap-2">
