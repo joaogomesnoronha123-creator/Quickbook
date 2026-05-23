@@ -15,7 +15,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 app.post("/api/gemini/summarize", async (req, res) => {
   const { title, content } = req.body;
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `Resuma o seguinte livro/conteúdo de forma estruturada para estudos:
     Título: ${title}
     Conteúdo: ${content}
@@ -38,7 +38,7 @@ app.post("/api/gemini/chat", async (req, res) => {
   const { summary, question } = req.body;
   try {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.5-flash",
       systemInstruction: `Você é um assistente especializado no livro resumido abaixo. 
       Resumo: ${summary}
       Responda dúvidas de forma clara e educativa.`
@@ -57,7 +57,7 @@ app.post("/api/gemini/general-chat", async (req, res) => {
   const { question, history } = req.body;
   try {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.5-flash",
       systemInstruction: "Você é o assistente virtual do QuickBook, um app inteligente de resumos e estudos. Responda de forma prestativa, curta e motivadora. Você pode ajudar com dúvidas sobre o app, dicas de estudo ou curiosidades literárias."
     });
     

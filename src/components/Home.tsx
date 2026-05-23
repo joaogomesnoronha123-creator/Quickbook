@@ -45,8 +45,12 @@ export default function Home({ onNavigate, userName, user }: HomeProps) {
         setError('Este e-mail já está vinculado a outra conta. Tente sair e entrar com Google diretamente.');
       } else if (err.code === 'auth/popup-closed-by-user') {
         // Safe to ignore
+      } else if (err.code === 'auth/unauthorized-domain' || err.code === 'auth/auth-domain-config-required') {
+        setError(`Domínio não autorizado: Adicione "${window.location.hostname}" nos domínios autorizados das configurações de Autenticação do Console Firebase.`);
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError("Provedor não ativado: Certifique-se de ativar o Google Sign-In no console de Autenticação do Firebase.");
       } else {
-        setError('Erro ao vincular conta. Tente novamente mais tarde.');
+        setError('Erro ao vincular conta. Devido ao frame do AI Studio, tente abrir o app em uma NOVA ABA no canto superior direito do preview.');
       }
     } finally {
       setLinking(false);

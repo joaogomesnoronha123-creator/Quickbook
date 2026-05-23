@@ -24,6 +24,20 @@ export default function Login() {
     console.error('Authentication error details:', err);
     if (!authErrors) return t.error;
 
+    // Detecção customizada de erros do Google Auth em frames e domínios não autorizados
+    if (err.code === 'auth/unauthorized-domain' || err.code === 'auth/auth-domain-config-required') {
+      return `Domínio não autorizado: Adicione o domínio "${window.location.hostname}" e "localhost" na seção de Domínios Autorizados no Console do Firebase (Autenticação > Configurações).`;
+    }
+    if (err.code === 'auth/operation-not-allowed') {
+      return "Provedor indisponível: O login com Google não foi ativado no Console do Firebase. Vá em Autenticação > Sign-in method e ative o provedor 'Google'.";
+    }
+    if (err.code === 'auth/web-storage-unsupported') {
+      return "Armazenamento ou cookies bloqueados: O navegador barrou o acesso ao armazenamento dentro do frame de simulação. Clique em 'Abrir em nova aba' (canto superior direito do preview) para que o Google Auth funcione 100%!";
+    }
+    if (err.code === 'auth/popup-blocked') {
+      return "Pop-up bloqueado: O navegador bloqueou a janela de login. DICA: Permita pop-ups para este site ou clique em 'Abrir em nova aba' no canto superior direito para acessar diretamente.";
+    }
+
     switch (err.code) {
       case 'auth/invalid-email': return authErrors.invalidEmail;
       case 'auth/user-not-found': return authErrors.userNotFound;
@@ -32,15 +46,17 @@ export default function Login() {
       case 'auth/email-already-in-use': return authErrors.emailInUse;
       case 'auth/weak-password': return authErrors.weakPassword;
       case 'auth/too-many-requests': return authErrors.tooManyRequests;
-      case 'auth/network-request-failed': return authErrors.networkError;
+      case 'auth/network-request-failed': return authErrors.networkError + " (DICA: Se estiver visualizando o frame do AI Studio, abra o app em uma NOVA ABA no canto superior direito do preview para evitar o bloqueio de cookies do Google pelo navegador)";
       case 'auth/popup-closed-by-user': return authErrors.popupClosed;
-      case 'auth/operation-not-allowed': return authErrors.operationNotAllowed;
       case 'auth/user-disabled': return authErrors.userDisabled;
       default:
         if (err.message?.includes('Missing or insufficient permissions')) {
           return authErrors.permissionDenied;
         }
-        return t.error;
+        if (err.message?.includes('storage') || err.message?.includes('cookie') || err.message?.includes('cross-origin') || err.message?.includes('popup')) {
+          return "Erro de pop-up no iframe: Por causa das regras de cookies de terceiros do navegador no frame do AI Studio, clique em 'Abrir em nova aba' no canto superior direito do painel de visualização para fazer login com Google.";
+        }
+        return err.message || t.error;
     }
   };
 
