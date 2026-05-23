@@ -115,7 +115,7 @@ export default function App() {
                 )}
               >
                 <item.icon className={cn("w-5 h-5 lg:w-6 lg:h-6 transition-transform group-hover:scale-110", isActive ? "text-black" : "")} />
-                <span className="text-[10px] lg:text-sm font-black lg:font-bold uppercase lg:capitalize tracking-widest lg:tracking-normal">
+                <span className="text-[10px] lg:text-sm font-black lg:font-bold uppercase lg:normal-case tracking-widest lg:tracking-normal">
                   {item.label}
                 </span>
                 {isActive && (
