@@ -342,7 +342,7 @@ export default function Settings({ userName, onUpdateName }: SettingsProps) {
       </AnimatePresence>
 
       <div className="mt-24 text-center border-t border-zinc-900 pt-12">
-        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">QuickBook Professional v1.0.0</p>
+        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.4em]">QuickBook AI Professional v1.0.0</p>
         <p className="text-xs text-zinc-700 mt-2 font-medium italic">Empowering deep study through intelligence</p>
       </div>
     </div>

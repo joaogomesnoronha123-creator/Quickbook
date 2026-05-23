@@ -197,7 +197,7 @@ export default function Login() {
             <BookOpen className="w-8 h-8 text-black" />
           </motion.div>
           <div>
-            <h1 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">QuickBook</h1>
+            <h1 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">QuickBook AI</h1>
             <p className="text-zinc-500 font-bold uppercase tracking-[0.3em] text-[8px] mt-1">Estudos Sem Burocracia</p>
           </div>
         </div>

@@ -40,7 +40,7 @@ export const translations = {
     },
     settings: {
       title: 'Configurações',
-      subtitle: 'Gerencie seu perfil e as preferências de leitura do QuickBook.',
+      subtitle: 'Gerencie seu perfil e as preferências de leitura do QuickBook AI.',
       profile: 'Perfil',
       userName: 'Seu Nome',
       appLanguage: 'Idioma do App',
@@ -78,7 +78,7 @@ export const translations = {
       backToLogin: 'Voltar para o Login',
       resetSent: 'Link de redefinição enviado para seu e-mail!',
       error: 'Erro ao processar. Verifique seus dados.',
-      title: 'Bem-vindo ao QuickBook',
+      title: 'Bem-vindo ao QuickBook AI',
       errors: {
         invalidEmail: 'E-mail inválido.',
         userNotFound: 'Usuário não encontrado.',
@@ -139,7 +139,7 @@ export const translations = {
     },
     settings: {
       title: 'Settings',
-      subtitle: 'Manage your profile and QuickBook reading preferences.',
+      subtitle: 'Manage your profile and QuickBook AI reading preferences.',
       profile: 'Profile',
       userName: 'Your Name',
       appLanguage: 'App Language',
@@ -177,7 +177,7 @@ export const translations = {
       backToLogin: 'Back to Login',
       resetSent: 'Reset link sent to your email!',
       error: 'Authentication error. Check your credentials.',
-      title: 'Welcome to QuickBook',
+      title: 'Welcome to QuickBook AI',
       errors: {
         invalidEmail: 'Invalid email address.',
         userNotFound: 'User not found.',
