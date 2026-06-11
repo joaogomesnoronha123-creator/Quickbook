@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -9,13 +9,19 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  httpOptions: {
+    headers: {
+      'User-Agent': 'aistudio-build',
+    }
+  }
+});
 
 // API Routes
 app.post("/api/gemini/summarize", async (req, res) => {
   const { title, content } = req.body;
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
     const prompt = `Resuma o seguinte livro/conteúdo de forma estruturada para estudos:
     Título: ${title}
     Conteúdo: ${content}
@@ -24,10 +30,13 @@ app.post("/api/gemini/summarize", async (req, res) => {
     1. Ideias principais
     2. Tópicos importantes
     3. Conclusão`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+    });
     
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    res.json({ text: response.text() });
+    res.json({ text: response.text });
   } catch (error: any) {
     console.error('Summarize Error:', error);
     res.status(500).json({ error: error.message });
@@ -37,16 +46,17 @@ app.post("/api/gemini/summarize", async (req, res) => {
 app.post("/api/gemini/chat", async (req, res) => {
   const { summary, question } = req.body;
   try {
-    const model = genAI.getGenerativeModel({ 
+    const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
-      systemInstruction: `Você é um assistente especializado no livro resumido abaixo. 
-      Resumo: ${summary}
-      Responda dúvidas de forma clara e educativa.`
+      contents: question,
+      config: {
+        systemInstruction: `Você é um assistente especializado no livro resumido abaixo. 
+        Resumo: ${summary}
+        Responda dúvidas de forma clara e educativa.`
+      }
     });
     
-    const result = await model.generateContent(question);
-    const response = await result.response;
-    res.json({ text: response.text() });
+    res.json({ text: response.text });
   } catch (error: any) {
     console.error('Chat Error:', error);
     res.status(500).json({ error: error.message });
@@ -56,21 +66,22 @@ app.post("/api/gemini/chat", async (req, res) => {
 app.post("/api/gemini/general-chat", async (req, res) => {
   const { question, history } = req.body;
   try {
-    const model = genAI.getGenerativeModel({ 
+    const chat = ai.chats.create({
       model: "gemini-3.5-flash",
-      systemInstruction: "Você é o assistente virtual do QuickBook, um app inteligente de resumos e estudos. Responda de forma prestativa, curta e motivadora. Você pode ajudar com dúvidas sobre o app, dicas de estudo ou curiosidades literárias."
-    });
-    
-    const chat = model.startChat({
-      history: history.map((m: any) => ({
+      history: (history || []).map((m: any) => ({
         role: m.role === 'model' ? 'model' : 'user',
-        parts: [{ text: m.parts[0].text }]
-      }))
+        parts: [{ text: m.parts?.[0]?.text || "" }]
+      })),
+      config: {
+        systemInstruction: "Você é o assistente virtual do QuickBook, um app inteligente de resumos e estudos. Responda de forma prestativa, curta e motivadora. Você pode ajudar com dúvidas sobre o app, dicas de estudo ou curiosidades literárias."
+      }
     });
     
-    const result = await chat.sendMessage(question);
-    const response = await result.response;
-    res.json({ text: response.text() });
+    const response = await chat.sendMessage({
+      message: question,
+    });
+    
+    res.json({ text: response.text });
   } catch (error: any) {
     console.error('General Chat Error:', error);
     res.status(500).json({ error: error.message });
