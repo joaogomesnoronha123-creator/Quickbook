@@ -9,19 +9,32 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error(
+      "A chave 'GEMINI_API_KEY' não está configurada. Por favor, adicione esta variável de ambiente nas configurações do seu projeto na Vercel (ou arquivo .env) e realize o deploy novamente."
+    );
   }
-});
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  }
+  return aiInstance;
+}
 
 // API Routes
 app.post("/api/gemini/summarize", async (req, res) => {
   const { title, content } = req.body;
   try {
+    const ai = getAI();
     const prompt = `Resuma o seguinte livro/conteúdo de forma estruturada para estudos:
     Título: ${title}
     Conteúdo: ${content}
@@ -46,6 +59,7 @@ app.post("/api/gemini/summarize", async (req, res) => {
 app.post("/api/gemini/chat", async (req, res) => {
   const { summary, question } = req.body;
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
       contents: question,
@@ -66,6 +80,7 @@ app.post("/api/gemini/chat", async (req, res) => {
 app.post("/api/gemini/general-chat", async (req, res) => {
   const { question, history } = req.body;
   try {
+    const ai = getAI();
     const chat = ai.chats.create({
       model: "gemini-3.5-flash",
       history: (history || []).map((m: any) => ({
